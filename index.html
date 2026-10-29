@@ -41,8 +41,9 @@ function share(){
 liff.init({liffId:LIFF_ID}).then(function(){
   if(!liff.isInClient()&&!liff.isLoggedIn()){liff.login({redirectUri:location.href});return new Promise(function(){});}   // 用一般瀏覽器開時先登入 LINE
   var q=new URLSearchParams(location.search);   // LIFF 會在 init 後還原帶進來的參數
-  var u=API+'?lk='+encodeURIComponent(q.get('lk')||'')+(q.get('card')&&q.get('card')!=='1'?'&card='+encodeURIComponent(q.get('card')):'&card=1&id='+encodeURIComponent(q.get('id')||'')+'&act='+encodeURIComponent(q.get('act')||''));
-  return fetch(u).then(function(r){return r.json();});
+  var c=q.get('card')&&q.get('card')!=='1'?q.get('card'):'1';
+  var body=JSON.stringify({leakcard:1,at:liff.getAccessToken(),p:{lk:q.get('lk')||'',card:c,id:q.get('id')||'',act:q.get('act')||''}});   // 帶 LINE 身分，伺服器確認有開放才給卡片
+  return fetch(API,{method:'POST',body:body}).then(function(r){return r.json();});
 }).then(function(d){
   if(!d||!d.ok){say('讀不到卡片',d&&d.error||'');return;}
   MSG=d.messages;say('卡片準備好了','選要傳到哪個群組或聊天室');$('b').hidden=false;$('b').onclick=share;share();
