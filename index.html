@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>止水樁改良施工回報・分享</title>
+<style>
+:root{--brand:#c15f3c;--text:#111d24;--muted:#56646b;--bg:#fafafa}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+.box{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.logo{width:60px;height:60px}
+h1{font-size:19px;margin:14px 0 6px}
+p{color:var(--muted);margin:0 0 20px;line-height:1.6}
+button{border:0;border-radius:14px;background:#06C755;color:#fff;font-size:17px;font-weight:800;padding:14px 28px}
+.foot{margin-top:26px;font-size:11px;letter-spacing:.14em;color:var(--brand);font-weight:800}
+</style>
+</head>
+<body>
+<div class="box">
+<svg class="logo" viewBox="0 0 200 200" aria-label="楊晏"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e08a5f"/><stop offset="1" stop-color="#c15f3c"/></linearGradient></defs><rect width="200" height="200" rx="44" fill="url(#g)"/><g transform="translate(20 22) scale(.8)"><circle cx="100" cy="62" r="22" fill="#fff4ea"/><g fill="none" stroke="#fff" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"><path d="M48 38 C56 88 78 112 100 122 C122 112 144 88 152 38"/><path d="M100 122 V172"/></g></g></svg>
+<h1 id="t">準備卡片中…</h1>
+<p id="m">請稍候</p>
+<button id="b" type="button" hidden>選擇聊天室分享</button>
+<div class="foot">MADE BY YENYANG</div>
+</div>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+// 止水樁改良施工回報：用使用者自己的 LINE 分享卡片（不佔官方帳號用量）
+var LIFF_ID = '2012266017-rnqBkcb3';
+var API = 'https://script.google.com/macros/s/AKfycbw7Sii_8LK8Uy9GZ6Fq7M3D4FxJ6oxnGEyYfiWIulsBQTtIYpmJWmj1yUyBUYP2WJWmlg/exec';
+var MSG = null;
+function $(i){return document.getElementById(i);}
+function say(t,m){$('t').textContent=t;$('m').textContent=m||'';}
+function share(){
+  if(!liff.isApiAvailable('shareTargetPicker')){say('這裡不能分享','請在 LINE 裡打開這個連結');return;}
+  liff.shareTargetPicker(MSG,{isMultiple:true}).then(function(r){
+    if(r){say('已分享','可以關閉這個畫面');setTimeout(function(){try{liff.closeWindow();}catch(e){}},800);}
+    else{say('沒有分享','要分享請再按一次');$('b').hidden=false;}
+  }).catch(function(e){say('分享失敗',String(e&&e.message||e));$('b').hidden=false;});
+}
+liff.init({liffId:LIFF_ID}).then(function(){
+  var q=new URLSearchParams(location.search);   // LIFF 會在 init 後還原帶進來的參數
+  var u=API+'?lk='+encodeURIComponent(q.get('lk')||'')+(q.get('card')==='morning'?'&card=morning':'&card=1&id='+encodeURIComponent(q.get('id')||'')+'&act='+encodeURIComponent(q.get('act')||''));
+  return fetch(u).then(function(r){return r.json();});
+}).then(function(d){
+  if(!d||!d.ok){say('讀不到卡片',d&&d.error||'');return;}
+  MSG=d.messages;say('卡片準備好了','選要傳到哪個群組或聊天室');$('b').hidden=false;$('b').onclick=share;share();
+}).catch(function(e){say('開啟失敗',String(e&&e.message||e));});
+</script>
+</body>
+</html>
