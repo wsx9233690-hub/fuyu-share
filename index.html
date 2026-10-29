@@ -39,6 +39,7 @@ function share(){
   }).catch(function(e){say('分享失敗',String(e&&e.message||e));$('b').hidden=false;});
 }
 liff.init({liffId:LIFF_ID}).then(function(){
+  if(!liff.isInClient()&&!liff.isLoggedIn()){liff.login({redirectUri:location.href});return new Promise(function(){});}   // 用一般瀏覽器開時先登入 LINE
   var q=new URLSearchParams(location.search);   // LIFF 會在 init 後還原帶進來的參數
   var u=API+'?lk='+encodeURIComponent(q.get('lk')||'')+(q.get('card')==='morning'?'&card=morning':'&card=1&id='+encodeURIComponent(q.get('id')||'')+'&act='+encodeURIComponent(q.get('act')||''));
   return fetch(u).then(function(r){return r.json();});
